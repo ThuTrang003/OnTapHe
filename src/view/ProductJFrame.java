@@ -460,12 +460,18 @@ public class ProductJFrame extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Bạn cần chọn một dòng trên table");
             return;
         }
+        String maSP = this.tblSanPham.getValueAt(row, 0).toString();
+        if (!maSP.equals(this.txtMaSP.getText().trim())) {
+            JOptionPane.showMessageDialog(this, "Bạn không được thay đổi mã sản phẩm");
+            this.txtMaSP.setText(maSP);
+            return;
+        }
 
         Product p = this.getFormData();
         if (p == null) {
             return;
         }
-        String maSP = this.tblSanPham.getValueAt(row, 0).toString();
+        
         this.prSvc.update(maSP, p);
         this.loadtable();
         this.loadCombobox();

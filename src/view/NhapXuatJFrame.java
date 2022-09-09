@@ -439,11 +439,19 @@ public class NhapXuatJFrame extends javax.swing.JFrame {
         }
         String soLuongCuStr = this.tblNhapXuat.getValueAt(row, 4).toString();
         int soLuongCu = Integer.parseInt(soLuongCuStr);
+        
         String maPhieu = this.tblNhapXuat.getValueAt(row, 0).toString();
+        if (!maPhieu.equals(this.txtMaSP.getText().trim())) {
+            JOptionPane.showMessageDialog(this, "Bạn không được thay đổi mã phiếu");
+            this.txtMaPhieu.setText(maPhieu);
+            return;
+        }
         this.inSvc.update(maPhieu, in);
+        
         String maSPStr = this.tblNhapXuat.getValueAt(row, 1).toString();
         String soLuongStr = this.txtSoLuong.getText().trim();
         this.proSvc.updateQuatity(Integer.parseInt(maSPStr), Integer.parseInt(soLuongStr), soLuongCu);
+        
         this.loadTable();
         this.clearForm();
         JOptionPane.showMessageDialog(this, "Cập nhật thành công");
