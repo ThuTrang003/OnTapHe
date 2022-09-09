@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package view;
 
 import java.awt.HeadlessException;
@@ -11,25 +7,23 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import model.Inventorylog;
 import model.Product;
-import serviec.ProductServiec;
-import serviec.inventorylogServiec;
+import service.ProductService;
+import service.InventoryLogService;
 
-/**
- *
- * @author ADMIN
- */
 public class NhapXuatJFrame extends javax.swing.JFrame {
 
-    private inventorylogServiec inSvc;
-    private ProductServiec proSvc;
+    private InventoryLogService inSvc;
+    private ProductService proSvc;
     public NhapXuatJFrame() {
         initComponents();
-        this.inSvc = new inventorylogServiec();
-        this.proSvc = new ProductServiec();
+        this.inSvc = new InventoryLogService();
+        this.proSvc = new ProductService();
         this.loadTable();
         this.clearForm();
     }
@@ -89,10 +83,19 @@ public class NhapXuatJFrame extends javax.swing.JFrame {
         }
         
         Date date = null;
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd");
+        Date dayNow = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        if (!checkNgay(ngayTao)) {
+            JOptionPane.showMessageDialog(this, "Sai định dạng ngày của ngày tạo phiếu");
+            return null;
+        }
         
         try {
             date = sdf.parse(ngayTao);
+            if (date.getTime() > dayNow.getTime()) {
+                JOptionPane.showMessageDialog(this, "Ngày tạo không tồn tại");
+                return null;
+            }
         } catch (ParseException ex) { 
             JOptionPane.showMessageDialog(this, "Sai định dạng ngày của ngày tạo phiếu");
             ex.printStackTrace();
@@ -114,12 +117,16 @@ public class NhapXuatJFrame extends javax.swing.JFrame {
             return null;
         }
         
-        Product p = new Product();
-        p.setQuantity(soluong);
-        this.proSvc.updateQuatity(maSP, p);
+        
         
         Inventorylog in = new Inventorylog(maSP, maPhieu, loaiPhieu, date, soluong);
         return in;
+    }
+    
+    private boolean checkNgay(String txt) {
+        Pattern p = Pattern.compile("^\\d{4}[\\-](0?[1-9]|1[012])[\\-](0?[1-9]|[12][0-9]|3[01])$");
+        Matcher m = p.matcher(txt);
+        return m.matches();
     }
     
     private boolean checkTrung(String txt){
@@ -379,11 +386,18 @@ public class NhapXuatJFrame extends javax.swing.JFrame {
         Inventorylog in = this.getFormData();
         if (in == null) {
             return;
-        } else if (checkTrung(in.getForm_id())) {
+        } else if (!checkTrung(in.getForm_id())) {
             JOptionPane.showMessageDialog(this, "Mã phiếu bị trùng", "Find fail", JOptionPane.ERROR_MESSAGE);
             return;
         } 
-        
+        String maSPStr = this.txtMaSP.getText().trim();
+        String soLuongStr = this.txtSoLuong.getText().trim();
+        if (in.getType_form() == 1) {
+            this.proSvc.addQuatity(Integer.parseInt(maSPStr), Integer.parseInt(soLuongStr));
+        } else {
+            this.proSvc.minusQuatity(Integer.parseInt(maSPStr), Integer.parseInt(soLuongStr));
+        }
+                
         this.inSvc.insert(in);
         this.loadTable();
         this.clearForm();
@@ -423,8 +437,13 @@ public class NhapXuatJFrame extends javax.swing.JFrame {
         if (in == null) {
             return;
         }
+        String soLuongCuStr = this.tblNhapXuat.getValueAt(row, 4).toString();
+        int soLuongCu = Integer.parseInt(soLuongCuStr);
         String maPhieu = this.tblNhapXuat.getValueAt(row, 0).toString();
         this.inSvc.update(maPhieu, in);
+        String maSPStr = this.tblNhapXuat.getValueAt(row, 1).toString();
+        String soLuongStr = this.txtSoLuong.getText().trim();
+        this.proSvc.updateQuatity(Integer.parseInt(maSPStr), Integer.parseInt(soLuongStr), soLuongCu);
         this.loadTable();
         this.clearForm();
         JOptionPane.showMessageDialog(this, "Cập nhật thành công");
@@ -443,6 +462,15 @@ public class NhapXuatJFrame extends javax.swing.JFrame {
         }
         String maPhieu = this.tblNhapXuat.getValueAt(row, 0).toString();
         this.inSvc.delete(maPhieu);
+        
+        Inventorylog in = this.getFormData();
+        String maSPStr = this.txtMaSP.getText().trim();
+        String soLuongStr = this.txtSoLuong.getText().trim();
+        if (in.getType_form() == 1) {
+            this.proSvc.minusQuatity(Integer.parseInt(maSPStr), Integer.parseInt(soLuongStr));
+        } else {
+            this.proSvc.addQuatity(Integer.parseInt(maSPStr), Integer.parseInt(soLuongStr));
+        }
         this.loadTable();
         this.clearForm();
         JOptionPane.showMessageDialog(this, "Xóa thành công");

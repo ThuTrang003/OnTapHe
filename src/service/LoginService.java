@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package serviec;
+package service;
 
 import java.util.ArrayList;
 import model.Login;
@@ -12,10 +12,10 @@ import repository.LoginRepository;
  *
  * @author ADMIN
  */
-public class LoginServiec {
+public class LoginService {
     private LoginRepository loginRepo;
 
-    public LoginServiec() {
+    public LoginService() {
         this.loginRepo = new LoginRepository();
     }
     

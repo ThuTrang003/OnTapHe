@@ -53,13 +53,44 @@ public class ProductRepository {
         }
     }
     
-    public void updateQuantity(int product_id, Product p) {
+    public void updateQuantity(Integer product_id, Integer quantity, Integer oldquantity) {
         try {
             Connection conn = DBContext.getConnection();
-            String query = "update product set quantity = ? where id = ?";
+            String query = "update product set quantity -= ? where id = ? \n" + "update product set quantity += ? where id = ?";
             
             PreparedStatement ps = conn.prepareStatement(query);
-            ps.setInt(1, p.getQuantity());
+            ps.setInt(1, oldquantity);
+            ps.setInt(2, product_id);
+            ps.setInt(3, quantity);
+            ps.setInt(4, product_id);
+            ps.execute();
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public void addQuantity(Integer product_id, Integer quantity) {
+        try {
+            Connection conn = DBContext.getConnection();
+            String query = "update product set quantity += ? where id = ?";
+            
+            PreparedStatement ps = conn.prepareStatement(query);
+            ps.setInt(1, quantity);
+            ps.setInt(2,product_id);
+            ps.execute();
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    public void minusQuantity(Integer product_id, Integer quantity) {
+        try {
+            Connection conn = DBContext.getConnection();
+            String query = "update product set quantity -= ? where id = ?";
+            
+            PreparedStatement ps = conn.prepareStatement(query);
+            ps.setInt(1, quantity);
             ps.setInt(2,product_id);
             ps.execute();
             
@@ -157,4 +188,62 @@ public class ProductRepository {
         }
     }
     
+    public Integer getID(String product_id) {
+        int id = -1;
+        try {
+            Connection conn = DBContext.getConnection();
+            String query = "select id from product where product_code like ?";
+            
+            PreparedStatement ps = conn.prepareStatement(query);
+            ps.setString(1, product_id);
+            ps.execute();
+            
+            ResultSet rs = ps.getResultSet();
+            while (rs.next()) {                
+                id = rs.getInt("id");
+            }
+            rs.close();
+            ps.close();
+            conn.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return id;
+    }
+    
+    public ArrayList<Product> getAllName(String product_name) {
+        ArrayList<Product> lst = new ArrayList<>();
+        try {
+            Connection conn = DBContext.getConnection();
+            String query = "select product_code, product_name, current_price,\n" +
+                            "p.category_id as id, c.category_name as category_name, quantity \n" +
+                            "from product as p left join category as c on p.category_id = c.id where product_name like '%'+N'" + product_name + "' +'%'";
+            
+            PreparedStatement ps = conn.prepareStatement(query);
+            ps.execute();
+            
+            ResultSet rs = ps.getResultSet();
+            while (rs.next()) {                
+                String product_code = rs.getString("product_code");
+                product_name = rs.getString("product_name");
+                BigDecimal current_price = rs.getBigDecimal("current_price");
+                int quantity = rs.getInt("quantity");
+                
+                int id = rs.getInt("id");
+                String category_name = rs.getString("category_name");
+                
+                Category c= new Category();
+                c.setId(id);
+                c.setCategory_name(category_name);
+                
+                
+                Product p = new Product(c, product_code, product_name, current_price, quantity);
+                lst.add(p);
+            }
+            return lst;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

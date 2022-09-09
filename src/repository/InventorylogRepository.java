@@ -18,7 +18,7 @@ import model.Product;
  *
  * @author ADMIN
  */
-public class InventorylogRepository {
+public class InventoryLogRepository {
     
     public void insert(Inventorylog in) {
         try {
@@ -100,9 +100,10 @@ public class InventorylogRepository {
         Inventorylog in = new Inventorylog();
         try {
             Connection conn = DBContext.getConnection();
-            String query = "select form_id, product_id, type_form, created_date, quantity from inventory_log where form_id like = ?";
+            String query = "select form_id, product_id, type_form, created_date, quantity from inventory_log where form_id like ?";
             
             PreparedStatement ps = conn.prepareStatement(query);
+            ps.setString(1, formID);
             ps.execute();
             
             ResultSet rs = ps.getResultSet();

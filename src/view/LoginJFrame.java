@@ -7,7 +7,7 @@ package view;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import model.Login;
-import serviec.LoginServiec;
+import service.LoginService;
 
 /**
  *
@@ -15,10 +15,11 @@ import serviec.LoginServiec;
  */
 public class LoginJFrame extends javax.swing.JFrame {
 
-    private LoginServiec loginSvc;
+    private LoginService loginSvc;
+    private int dem = 0;
     public LoginJFrame() {
         initComponents();
-        this.loginSvc = new LoginServiec();
+        this.loginSvc = new LoginService();
     }
 
     public boolean checkLogin() {
@@ -50,6 +51,11 @@ public class LoginJFrame extends javax.swing.JFrame {
 
         jButton1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jButton1.setText("Exit");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         jLabel2.setText("User name");
@@ -150,12 +156,25 @@ public class LoginJFrame extends javax.swing.JFrame {
                     qlSv.setVisible(true);
                     this.dispose();
                 } else {
-                    JOptionPane.showMessageDialog(this, "Đăng nhập thất bại\n"
+                    if (dem == 5) {
+                        JOptionPane.showMessageDialog(this, "Đăng nhập thất bại\n"
                             + "Sai mật khẩu hoặc tên đăng nhập", "Login fail", JOptionPane.ERROR_MESSAGE);
+                        System.exit(0);
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Đăng nhập thất bại\n"
+                            + "Sai mật khẩu hoặc tên đăng nhập \n" + "Bạn còn lại " + (5 - dem) + "/5 số lần đăng nhập", "Login fail", JOptionPane.ERROR_MESSAGE);
+                        dem++;
+                    }
+                    
                 }
 
         }
     }//GEN-LAST:event_btnDangNhapActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+        System.exit(0);
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments

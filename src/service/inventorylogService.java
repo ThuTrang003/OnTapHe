@@ -2,21 +2,21 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package serviec;
+package service;
 
 import java.util.ArrayList;
 import model.Inventorylog;
-import repository.InventorylogRepository;
+import repository.InventoryLogRepository;
 
 /**
  *
  * @author ADMIN
  */
-public class inventorylogServiec {
-    private InventorylogRepository inRepo;
+public class InventoryLogService {
+    private InventoryLogRepository inRepo;
 
-    public inventorylogServiec() {
-        this.inRepo = new InventorylogRepository();
+    public InventoryLogService() {
+        this.inRepo = new InventoryLogRepository();
     }
     
     public void insert(Inventorylog in) {
